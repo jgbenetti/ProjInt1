@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+    <body>
+
+        <h1>Projeto Integrador 1 (TESTE)</h1>
+
+        <p>Preencha o fomulario com sua proposta:</p>
+  
+        <label for="formName">Nome:</label><br>
+        <input type="text" id="formName" name="formName" value=""><br><br>
+
+        <label for="formEmail">Email:</label><br>
+        <input type="text" id="formEmail" name="formEmail" value=""><br><br>
+
+        <label for="formEventName">Nome do Evento:</label><br>
+        <input type="text" id="formEventName" name="formEventName" value=""><br><br>
+
+        <label for="formEventDate">Data do Evento:</label><br>
+        <input type="date" id="formEventDate" name="formEventDate" value=""><br><br>
+
+
+
+
+        <button type="button" onclick="EnviarDados()">Enviar</button>
+
+        <p id="demo"></p>
+
+        <p id="formNameSent">a</p>
+        <p id="formEmailSent">b</p>
+        <p id="formEventNameSent">c</p>
+        <p id="formEventDateSent">d</p>
+        
+
+        <script>
+
+            function EnviarDados() 
+            { 
+
+                var formName = document.getElementById("formName").value;
+                var formEmail = document.getElementById("formEmail").value;
+                var formEventName = document.getElementById("formEventName").value;
+                var formEventDate = document.getElementById("formEventDate").value;
+
+                document.getElementById("demo").innerHTML = "Formulario enviado!";
+                document.getElementById("formNameSent").innerHTML =  formName;
+                document.getElementById("formEmailSent").innerHTML = formEmail;
+                document.getElementById("formEventNameSent").innerHTML =  formEventName;
+                document.getElementById("formEventDateSent").innerHTML = formEventDate;
+
+            }
+
+        </script>
+
+    </body>
+</html>
