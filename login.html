@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <body>
+
+        <h1>Projeto Integrador 1 (TESTE)</h1>
+
+        <p>Login:</p>
+  
+
+        <label for="userEmail">Email:</label><br>
+        <input type="text" id="userEmail" name="userEmail" value=""><br><br>
+
+        <label for="userPassword">Senha:</label><br>
+        <input type="password" id="userPassword" name="userPassword" value=""><br><br>
+
+        <button type="button" onclick="SendLoginInfo()">Enviar</button>
+
+        <p id="demo"></p>
+
+        <script>
+
+            async function SendLoginInfo() 
+            { 
+                const API_BASE_URL = "http://localhost:5055";
+                const LOGIN_ENDPOINT = `${API_BASE_URL}/api/Login`;
+
+                var userEmail    = document.getElementById("userEmail").value;
+                var userPassword = document.getElementById("userPassword").value;
+
+                // Validação básica no front
+                if (!userEmail || !userPassword) {
+                    document.getElementById("demo").innerHTML = "Preencha todos os campos!";
+                    return;
+                }
+
+                const loginData = {
+                    email:    userEmail,
+                    senha:    userPassword
+                };
+
+                try {
+                    const response = await fetch(LOGIN_ENDPOINT, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(loginData)
+                    });
+
+                    if (response.ok) {
+                        const result = await response.json();
+                        document.getElementById("demo").innerHTML = `Login bem-sucedido! Token: ${result.token}`;
+                    } else {
+                        document.getElementById("demo").innerHTML = "Falha no login. Verifique suas credenciais.";
+                    }
+                } catch (error) {
+                    console.error('Erro ao enviar dados de login:', error);
+                    document.getElementById("demo").innerHTML = "Ocorreu um erro ao tentar fazer login.";
+                }
+            }
+
+        </script>
+
+
+
+    </body>
+</html>
+                

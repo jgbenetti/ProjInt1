@@ -4,52 +4,143 @@
 
         <h1>Projeto Integrador 1 (TESTE)</h1>
 
-        <p>Preencha o fomulario com sua proposta:</p>
+        <p>Cadastre-se:</p>
   
-        <label for="formName">Nome:</label><br>
-        <input type="text" id="formName" name="formName" value=""><br><br>
+        <label for="userName">Nome:</label><br>
+        <input type="text" id="userName" name="userName" value=""><br><br>
 
-        <label for="formEmail">Email:</label><br>
-        <input type="text" id="formEmail" name="formEmail" value=""><br><br>
+        <label for="userEmail">Email:</label><br>
+        <input type="text" id="userEmail" name="userEmail" value=""><br><br>
 
-        <label for="formEventName">Nome do Evento:</label><br>
-        <input type="text" id="formEventName" name="formEventName" value=""><br><br>
+        <label for="userPassword">Senha:</label><br>
+        <input type="password" id="userPassword" name="userPassword" value=""><br><br>
 
-        <label for="formEventDate">Data do Evento:</label><br>
-        <input type="date" id="formEventDate" name="formEventDate" value=""><br><br>
-
-
-
-
-        <button type="button" onclick="EnviarDados()">Enviar</button>
+        <button type="button" onclick="EnviarDadosUsuario()">Enviar</button>
 
         <p id="demo"></p>
 
-        <p id="formNameSent">a</p>
-        <p id="formEmailSent">b</p>
-        <p id="formEventNameSent">c</p>
-        <p id="formEventDateSent">d</p>
-        
+        <br><br><br><br><br><br><br><br>
+
+        <p>Criar Votação</p>
+  
+        <label for="titulo">Título:</label><br>
+        <input type="text" id="titulo" name="titulo" value=""><br><br>
+
+        <label for="opcao1">Opção 1:</label><br>
+        <input type="text" id="opcao1" name="opcao1" value=""><br><br>
+
+        <label for="opcao2">Opção 2:</label><br>
+        <input type="text" id="opcao2" name="opcao2" value=""><br><br>
+
+        <button type="button" onclick="EnviarDadosVotacao()">Enviar</button>
+
+        <p id="demo2"></p>
+
+
 
         <script>
 
-            function EnviarDados() 
+            async function EnviarDadosUsuario() 
             { 
+                const API_BASE_URL = "http://localhost:5055";
+                const USUARIO_ENDPOINT = `${API_BASE_URL}/api/Usuario`;
 
-                var formName = document.getElementById("formName").value;
-                var formEmail = document.getElementById("formEmail").value;
-                var formEventName = document.getElementById("formEventName").value;
-                var formEventDate = document.getElementById("formEventDate").value;
+                var userName     = document.getElementById("userName").value;
+                var userEmail    = document.getElementById("userEmail").value;
+                var userPassword = document.getElementById("userPassword").value;
 
-                document.getElementById("demo").innerHTML = "Formulario enviado!";
-                document.getElementById("formNameSent").innerHTML =  formName;
-                document.getElementById("formEmailSent").innerHTML = formEmail;
-                document.getElementById("formEventNameSent").innerHTML =  formEventName;
-                document.getElementById("formEventDateSent").innerHTML = formEventDate;
+                // Validação básica no front
+                if (!userName || !userEmail || !userPassword) {
+                    document.getElementById("demo").innerHTML = "Preencha todos os campos!";
+                    return;
+                }
 
+                const usuario = {
+                    nome:  userName,
+                    email: userEmail,
+                    senha: userPassword
+                };
+
+                try {
+                    const response = await fetch(USUARIO_ENDPOINT, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(usuario)
+                    });
+
+                    if (response.ok) {
+                        const resultado = await response.json();
+                        document.getElementById("demo").innerHTML = 
+                            `Usuário <strong>${resultado.nome}</strong> cadastrado com sucesso! (ID: ${resultado.id})`;
+                        
+                        // Limpa o formulario apos sucesso
+                        document.getElementById("userName").value     = "";
+                        document.getElementById("userEmail").value    = "";
+                        document.getElementById("userPassword").value = "";
+                    } else {
+                        const erro = await response.text();
+                        document.getElementById("demo").innerHTML = `Erro ao cadastrar: ${erro}`;
+                    }
+
+                } catch (error) {
+                    document.getElementById("demo").innerHTML = 
+                        `Não foi possível conectar à API. Verifique se o servidor está rodando.<br><small>${error}</small>`;
+                }
+            }
+
+            async function EnviarDadosVotacao() 
+            { 
+                const API_BASE_URL = "http://localhost:5055";
+                const VOTACAO_ENDPOINT = `${API_BASE_URL}/api/Votacao`;
+
+                var titulo = document.getElementById("titulo").value;
+                var opcao1 = document.getElementById("opcao1").value;
+                var opcao2 = document.getElementById("opcao2").value;
+
+                // Validação básica no front
+                if (!titulo || !opcao1 || !opcao2) {
+                    document.getElementById("demo2").innerHTML = "Preencha todos os campos!";
+                    return;
+                }
+
+                const votacao = {
+                    titulo:  titulo,
+                    opcao1: opcao1,
+                    opcao2: opcao2
+                };
+
+                try {
+                    const response = await fetch(VOTACAO_ENDPOINT, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(votacao)
+                    });
+
+                    if (response.ok) {
+                        const resultado = await response.json();
+                        document.getElementById("demo2").innerHTML = 
+                            `Votacao <strong>${resultado.titulo}</strong> criada com sucesso! (ID: ${resultado.id})`;
+                        
+                        // Limpa o formulario apos sucesso
+                        document.getElementById("titulo").value = "";
+                        document.getElementById("opcao1").value = "";
+                        document.getElementById("opcao2").value = "";
+                    } else {
+                        const erro = await response.text();
+                        document.getElementById("demo2").innerHTML = `Erro ao criar votacao: ${erro}`;
+                    }
+
+                } catch (error) {
+                    document.getElementById("demo").innerHTML = 
+                        `Não foi possível conectar à API. Verifique se o servidor está rodando.<br><small>${error}</small>`;
+                }
             }
 
         </script>
-
     </body>
 </html>
+                
