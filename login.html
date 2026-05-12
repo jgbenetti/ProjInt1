@@ -15,28 +15,26 @@
             e.preventDefault();
 
             try {
-                const res = await fetch('http://localhost:5055/api/login', {
+                const res = await fetch('http://localhost:5055/api/login/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
                     body: JSON.stringify({
                     Email: document.getElementById('username').value,
                     Senha: document.getElementById('password').value,
-                    })
-                });
+                })
+            });
 
-                if (res.ok) {
-                    window.location.href = 'index.html';
-                    //alert('Login efetuado com sucesso!');
-                } else {
-                    const err = await res.json();
-                    console.log('Full error:', JSON.stringify(err));
-                    alert('Credenciais inválidas');
-                }
-                }catch (err) {
-                    console.error('Erro ao conectar com o servidor:', err);
-                    alert('Não foi possível conectar ao servidor. Verifique se a API está rodando.');
-                }
+            if (res.ok) {
+                const data = await res.json();
+                sessionStorage.setItem('token', data.token);  // ✅ save token
+                window.location.href = 'dashboard.html';
+            } else {
+                alert('Credenciais inválidas');
+            }
+        } catch (err) {
+            console.error('Erro ao conectar com o servidor:', err);
+            alert('Não foi possível conectar ao servidor. Verifique se a API está rodando.');
+        }
             });
         </script>
     </body>

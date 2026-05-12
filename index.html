@@ -20,24 +20,6 @@
         <p id="demo"></p>
 
         <br><br><br><br><br><br><br><br>
-
-        <p>Criar Votação</p>
-  
-        <label for="titulo">Título:</label><br>
-        <input type="text" id="titulo" name="titulo" value=""><br><br>
-
-        <label for="opcao1">Opção 1:</label><br>
-        <input type="text" id="opcao1" name="opcao1" value=""><br><br>
-
-        <label for="opcao2">Opção 2:</label><br>
-        <input type="text" id="opcao2" name="opcao2" value=""><br><br>
-
-        <button type="button" onclick="EnviarDadosVotacao()">Enviar</button>
-
-        <p id="demo2"></p>
-
-
-
         <script>
 
             async function EnviarDadosUsuario() 
@@ -82,56 +64,6 @@
                     } else {
                         const erro = await response.text();
                         document.getElementById("demo").innerHTML = `Erro ao cadastrar: ${erro}`;
-                    }
-
-                } catch (error) {
-                    document.getElementById("demo").innerHTML = 
-                        `Não foi possível conectar à API. Verifique se o servidor está rodando.<br><small>${error}</small>`;
-                }
-            }
-
-            async function EnviarDadosVotacao() 
-            { 
-                const API_BASE_URL = "http://localhost:5055";
-                const VOTACAO_ENDPOINT = `${API_BASE_URL}/api/Votacao`;
-
-                var titulo = document.getElementById("titulo").value;
-                var opcao1 = document.getElementById("opcao1").value;
-                var opcao2 = document.getElementById("opcao2").value;
-
-                // Validação básica no front
-                if (!titulo || !opcao1 || !opcao2) {
-                    document.getElementById("demo2").innerHTML = "Preencha todos os campos!";
-                    return;
-                }
-
-                const votacao = {
-                    titulo:  titulo,
-                    opcao1: opcao1,
-                    opcao2: opcao2
-                };
-
-                try {
-                    const response = await fetch(VOTACAO_ENDPOINT, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(votacao)
-                    });
-
-                    if (response.ok) {
-                        const resultado = await response.json();
-                        document.getElementById("demo2").innerHTML = 
-                            `Votacao <strong>${resultado.titulo}</strong> criada com sucesso! (ID: ${resultado.id})`;
-                        
-                        // Limpa o formulario apos sucesso
-                        document.getElementById("titulo").value = "";
-                        document.getElementById("opcao1").value = "";
-                        document.getElementById("opcao2").value = "";
-                    } else {
-                        const erro = await response.text();
-                        document.getElementById("demo2").innerHTML = `Erro ao criar votacao: ${erro}`;
                     }
 
                 } catch (error) {
