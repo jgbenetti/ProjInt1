@@ -1,230 +1,238 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Dashboard</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-    <h1>Bem vindo, <span id="userName"></span>!</h1>
-    <button onclick="logout()">Sair</button>
-
-    <p>Criar Votação</p>
-  
-        <label for="titulo">Título:</label><br>
-        <input type="text" id="titulo" name="titulo" value=""><br><br>
-
-        <label for="opcao1">Opção 1:</label><br>
-        <input type="text" id="opcao1" name="opcao1" value=""><br><br>
-
-        <label for="opcao2">Opção 2:</label><br>
-        <input type="text" id="opcao2" name="opcao2" value=""><br><br>
-
-        <label for="opcao3">Opção 3:</label><br>
-        <input type="text" id="opcao3" name="opcao3" value=""><br><br>
-
-        <label for="opcao4">Opção 4:</label><br>
-        <input type="text" id="opcao4" name="opcao4" value=""><br><br>
-
-        <label for="opcao5">Opção 5:</label><br>
-        <input type="text" id="opcao5" name="opcao5" value=""><br><br>
-
-        <button type="button" onclick="EnviarDadosVotacao()">Enviar</button>
-
-        <p id="demo2"></p>
-
-        <br><br><br><br><br><br><br><br><br>    
-
-        <h1>Votações</h1>
-        <div id="polls-container">Carregando...</div>
-
-    
-
-
-    <script src="auth.js"></script>
-    <script>
-        // Run on page load — redirects to login if not authenticated
-
-
-
-        checkAuth().then(user => {
-            if (user) {
-                document.getElementById('userName').textContent = user.nome;
-                userID = user.id; // Save user ID for later use
-            }
-        });
-
-        var userID = null;
-
-        async function EnviarDadosVotacao() 
-            { 
-                const API_BASE_URL = "http://localhost:5055";
-                const VOTACAO_ENDPOINT = `${API_BASE_URL}/api/Votacao`;
-
-                var titulo = document.getElementById("titulo").value;
-                var opcao1 = document.getElementById("opcao1").value;
-                var opcao2 = document.getElementById("opcao2").value;
-                var opcao3 = document.getElementById("opcao3").value;
-                var opcao4 = document.getElementById("opcao4").value;
-                var opcao5 = document.getElementById("opcao5").value;
-
-                // Validação básica no front
-                if (!titulo || !opcao1 || !opcao2) {
-                    document.getElementById("demo2").innerHTML = "Preencha ao menos o título e duas opções!";
-                    return;
-                }
-
-                const votacao = {
-                    userId: userID, // Associate poll with logged-in user
-                    titulo:  titulo,
-                    opcao1: opcao1,
-                    opcao2: opcao2,
-                    opcao3: opcao3,
-                    opcao4: opcao4,
-                    opcao5: opcao5
-                };
-
-                try {
-                    const response = await fetch(VOTACAO_ENDPOINT, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(votacao)
-                    });
-
-                    if (response.ok) {
-                        const resultado = await response.json();
-                        document.getElementById("demo2").innerHTML = 
-                            `Votacao <strong>${resultado.titulo}</strong> criada com sucesso! (ID: ${resultado.id})`;
-                        
-                        // Limpa o formulario apos sucesso
-                        document.getElementById("titulo").value = "";
-                        document.getElementById("opcao1").value = "";
-                        document.getElementById("opcao2").value = "";
-                        document.getElementById("opcao3").value = "";
-                        document.getElementById("opcao4").value = "";
-                        document.getElementById("opcao5").value = "";
-                    } else {
-                        const erro = await response.text();
-                        document.getElementById("demo2").innerHTML = `Erro ao criar votacao: ${erro}`;
-                    }
-
-                } catch (error) {
-                    document.getElementById("demo").innerHTML = 
-                        `Não foi possível conectar à API. Verifique se o servidor está rodando.<br><small>${error}</small>`;
-                }
-            }
-
-        const API_URL = "http://localhost:5055/api/Votacao"; // change to your actual base URL
  
-        async function loadPolls() {
-        const container = document.getElementById("polls-container");
-    
-        try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
-    
-            const polls = await response.json();
-    
-            if (!polls.length) {
-            container.textContent = "Nenhuma votação encontrada.";
-            return;
-            }
-    
-            container.innerHTML = "";
-            polls.forEach(poll => container.appendChild(createPollCard(poll)));
-    
-        } catch (err) {
-            container.textContent = `Erro ao carregar votações: ${err.message}`;
-        }
-        }
-    
-        function createPollCard(poll) {
-        // Gather only non-null options and their vote counts
-        const options = [
-            { label: poll.opcao1, votes: poll.votosOpcao1 },
-            { label: poll.opcao2, votes: poll.votosOpcao2 },
-            { label: poll.opcao3, votes: poll.votosOpcao3 },
-            { label: poll.opcao4, votes: poll.votosOpcao4 },
-            { label: poll.opcao5, votes: poll.votosOpcao5 },
-        ].filter(o => o.label);
-    
-        const totalVotes = options.reduce((sum, o) => sum + o.votes, 0);
-    
-        // Card wrapper
-        const card = document.createElement("div");
-        card.dataset.pollId = poll.id;
-    
-        // Title
-        const title = document.createElement("h2");
-        title.textContent = poll.titulo;
-        card.appendChild(title);
-    
-        // Meta: poll ID and author
-        const meta = document.createElement("p");
-        meta.textContent = `Poll #${poll.id} · Autor ID: ${poll.userId}`;
-        card.appendChild(meta);
-    
-        // Options list
-        const list = document.createElement("ul");
-        options.forEach((option, index) => {
-            const pct = totalVotes > 0 ? Math.round((option.votes / totalVotes) * 100) : 0;
-    
-            const item = document.createElement("li");
-    
-            const label = document.createElement("span");
-            label.textContent = `${option.label} — ${option.votes} voto(s) (${pct}%)`;
-    
-            const voteBtn = document.createElement("button");
-            voteBtn.textContent = "Votar";
-            voteBtn.onclick = () => vote(poll.id, index + 1, card);
-    
-            item.appendChild(label);
-            item.appendChild(voteBtn);
-            list.appendChild(item);
+  <!-- Navbar -->
+  <nav class="navbar">
+    <span class="navbar-brand">Votações</span>
+    <div class="navbar-user">
+      <span>Olá, <strong id="userName"></strong></span>
+      <button class="btn btn-ghost" onclick="logout()">Sair</button>
+    </div>
+  </nav>
+ 
+  <div class="page-wrapper wide">
+ 
+    <!-- Create poll form -->
+    <p class="section-title">Nova votação</p>
+    <div class="card">
+      <div class="form-group">
+        <label for="titulo">Título</label>
+        <input type="text" id="titulo" placeholder="Pergunta da votação"/>
+      </div>
+ 
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem">
+        <div class="form-group">
+          <label for="opcao1">Opção 1</label>
+          <input type="text" id="opcao1" placeholder="Opção 1"/>
+        </div>
+        <div class="form-group">
+          <label for="opcao2">Opção 2</label>
+          <input type="text" id="opcao2" placeholder="Opção 2"/>
+        </div>
+        <div class="form-group">
+          <label for="opcao3">Opção 3</label>
+          <input type="text" id="opcao3" placeholder="Opção 3 (opcional)"/>
+        </div>
+        <div class="form-group">
+          <label for="opcao4">Opção 4</label>
+          <input type="text" id="opcao4" placeholder="Opção 4 (opcional)"/>
+        </div>
+        <div class="form-group">
+          <label for="opcao5">Opção 5</label>
+          <input type="text" id="opcao5" placeholder="Opção 5 (opcional)"/>
+        </div>
+      </div>
+ 
+      <button class="btn btn-primary" onclick="EnviarDadosVotacao()">Criar votação</button>
+      <p id="demo2" class="msg"></p>
+    </div>
+ 
+    <hr class="divider"/>
+ 
+    <!-- Polls list -->
+    <p class="section-title">Votações</p>
+    <div id="polls-container" class="polls-grid">
+      <p class="text-muted">Carregando...</p>
+    </div>
+ 
+  </div>
+ 
+  <script src="auth.js"></script>
+  <script>
+    const API_URL = "http://localhost:5055/api/Votacao";
+    var userID = null;
+ 
+    checkAuth().then(user => {
+      if (user) {
+        document.getElementById('userName').textContent = user.nome;
+        userID = user.id;
+      }
+    });
+ 
+    async function EnviarDadosVotacao() {
+      const msgEl = document.getElementById("demo2");
+      const titulo = document.getElementById("titulo").value;
+      const opcao1 = document.getElementById("opcao1").value;
+      const opcao2 = document.getElementById("opcao2").value;
+      const opcao3 = document.getElementById("opcao3").value;
+      const opcao4 = document.getElementById("opcao4").value;
+      const opcao5 = document.getElementById("opcao5").value;
+ 
+      if (!titulo || !opcao1 || !opcao2) {
+        msgEl.textContent = "Preencha ao menos o título e duas opções!";
+        msgEl.className = "msg error";
+        return;
+      }
+ 
+      const votacao = { userId: userID, titulo, opcao1, opcao2, opcao3, opcao4, opcao5 };
+ 
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(votacao)
         });
-        card.appendChild(list);
-    
-        // Total votes
-        const total = document.createElement("p");
-        total.textContent = `Total de votos: ${totalVotes}`;
-        card.appendChild(total);
-    
-        return card;
+ 
+        if (response.ok) {
+          const resultado = await response.json();
+          msgEl.textContent = `Votação "${resultado.titulo}" criada com sucesso!`;
+          msgEl.className = "msg success";
+          ["titulo","opcao1","opcao2","opcao3","opcao4","opcao5"]
+            .forEach(id => document.getElementById(id).value = "");
+          loadPolls();
+        } else {
+          const erro = await response.text();
+          msgEl.textContent = `Erro ao criar votação: ${erro}`;
+          msgEl.className = "msg error";
         }
-    
-        async function vote(pollId, optionNumber, card) {
-        try {
-            // Fetch current poll state
-            const res = await fetch(`${API_URL}/${pollId}`);
-            if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
-            const poll = await res.json();
-    
-            // Increment the chosen option
-            const voteField = `votosOpcao${optionNumber}`;
-            poll[voteField] = (poll[voteField] || 0) + 1;
-    
-            // Send updated poll back
-            const updateRes = await fetch(`${API_URL}/${pollId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(poll),
-            });
-    
-            if (!updateRes.ok) throw new Error(`Erro ao votar: ${updateRes.status}`);
-    
-            const updated = await updateRes.json();
-    
-            // Re-render this card in place
-            const newCard = createPollCard(updated);
-            card.replaceWith(newCard);
-    
-        } catch (err) {
-            alert(`Erro ao registrar voto: ${err.message}`);
+      } catch (error) {
+        msgEl.textContent = `Não foi possível conectar à API. ${error}`;
+        msgEl.className = "msg error";
+      }
+    }
+ 
+    async function loadPolls() {
+      const container = document.getElementById("polls-container");
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error(`HTTP error: ${response.status}`);
+        const polls = await response.json();
+ 
+        if (!polls.length) {
+          container.innerHTML = '<p class="text-muted">Nenhuma votação encontrada.</p>';
+          return;
         }
-        }
-    
-        loadPolls();
-
-    </script>
+        container.innerHTML = "";
+        polls.forEach(poll => container.appendChild(createPollCard(poll)));
+      } catch (err) {
+        container.innerHTML = `<p class="text-muted">Erro ao carregar votações: ${err.message}</p>`;
+      }
+    }
+ 
+    function createPollCard(poll) {
+      const options = [
+        { label: poll.opcao1, votes: poll.votosOpcao1 },
+        { label: poll.opcao2, votes: poll.votosOpcao2 },
+        { label: poll.opcao3, votes: poll.votosOpcao3 },
+        { label: poll.opcao4, votes: poll.votosOpcao4 },
+        { label: poll.opcao5, votes: poll.votosOpcao5 },
+      ].filter(o => o.label);
+ 
+      const totalVotes = options.reduce((sum, o) => sum + o.votes, 0);
+ 
+      const card = document.createElement("div");
+      card.className = "card";
+      card.dataset.pollId = poll.id;
+ 
+      const title = document.createElement("h2");
+      title.textContent = poll.titulo;
+      card.appendChild(title);
+ 
+      const meta = document.createElement("p");
+      meta.className = "card-meta";
+      meta.textContent = `Poll #${poll.id} · Autor ID: ${poll.userId} · ${totalVotes} voto(s)`;
+      card.appendChild(meta);
+ 
+      const list = document.createElement("ul");
+      list.className = "poll-options";
+ 
+      options.forEach((option, index) => {
+        const pct = totalVotes > 0 ? Math.round((option.votes / totalVotes) * 100) : 0;
+ 
+        const item = document.createElement("li");
+        item.className = "poll-option";
+ 
+        // Bar background
+        const barWrap = document.createElement("div");
+        barWrap.className = "poll-option-bar-wrap";
+        barWrap.style.flex = "1";
+        barWrap.style.position = "relative";
+ 
+        const bar = document.createElement("div");
+        bar.className = "poll-option-bar";
+        bar.style.width = `${pct}%`;
+        barWrap.appendChild(bar);
+ 
+        const textRow = document.createElement("div");
+        textRow.className = "poll-option-text";
+ 
+        const labelSpan = document.createElement("span");
+        labelSpan.textContent = option.label;
+ 
+        const pctSpan = document.createElement("span");
+        pctSpan.className = "poll-option-pct";
+        pctSpan.textContent = `${option.votes} (${pct}%)`;
+ 
+        textRow.appendChild(labelSpan);
+        textRow.appendChild(pctSpan);
+        barWrap.appendChild(textRow);
+ 
+        const voteBtn = document.createElement("button");
+        voteBtn.className = "btn btn-outline";
+        voteBtn.style.flexShrink = "0";
+        voteBtn.textContent = "Votar";
+        voteBtn.onclick = () => vote(poll.id, index + 1, card);
+ 
+        item.appendChild(barWrap);
+        item.appendChild(voteBtn);
+        list.appendChild(item);
+      });
+ 
+      card.appendChild(list);
+      return card;
+    }
+ 
+    async function vote(pollId, optionNumber, card) {
+      try {
+        const res = await fetch(`${API_URL}/${pollId}`);
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        const poll = await res.json();
+ 
+        const voteField = `votosOpcao${optionNumber}`;
+        poll[voteField] = (poll[voteField] || 0) + 1;
+ 
+        const updateRes = await fetch(`${API_URL}/${pollId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(poll),
+        });
+ 
+        if (!updateRes.ok) throw new Error(`Erro ao votar: ${updateRes.status}`);
+        const updated = await updateRes.json();
+        card.replaceWith(createPollCard(updated));
+      } catch (err) {
+        alert(`Erro ao registrar voto: ${err.message}`);
+      }
+    }
+ 
+    loadPolls();
+  </script>
 </body>
 </html>

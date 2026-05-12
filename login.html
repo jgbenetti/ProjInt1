@@ -1,41 +1,64 @@
 <!DOCTYPE html>
-<html>
-    <head>
-        <title>Login</title>
-    </head>
-    <body>
-        <form id="loginForm">
-            <input type="text" id="username" placeholder="Username" required />
-            <input type="password" id="password" placeholder="Password" required />
-            <button type="submit">Login</button>
-        </form>
-
-        <script>
-            document.getElementById('loginForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            try {
-                const res = await fetch('http://localhost:5055/api/login/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                    Email: document.getElementById('username').value,
-                    Senha: document.getElementById('password').value,
-                })
-            });
-
-            if (res.ok) {
-                const data = await res.json();
-                sessionStorage.setItem('token', data.token);  // ✅ save token
-                window.location.href = 'dashboard.html';
-            } else {
-                alert('Credenciais inválidas');
-            }
-        } catch (err) {
-            console.error('Erro ao conectar com o servidor:', err);
-            alert('Não foi possível conectar ao servidor. Verifique se a API está rodando.');
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+ 
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h1>Entrar</h1>
+      <p class="subtitle">Bem-vindo de volta.</p>
+ 
+      <div class="form-group">
+        <label for="username">Email</label>
+        <input type="text" id="username" placeholder="seu@email.com" required/>
+      </div>
+ 
+      <div class="form-group">
+        <label for="password">Senha</label>
+        <input type="password" id="password" placeholder="••••••••" required/>
+      </div>
+ 
+      <button class="btn btn-primary" style="width:100%" id="loginBtn">Entrar</button>
+ 
+      <p id="loginMsg" class="msg"></p>
+ 
+      <p class="text-muted text-small mt-2" style="text-align:center">
+        Não tem conta? <a href="index.html" style="color:var(--accent)">Cadastre-se</a>
+      </p>
+    </div>
+  </div>
+ 
+  <script>
+    document.getElementById('loginBtn').addEventListener('click', async () => {
+      const msgEl = document.getElementById('loginMsg');
+      try {
+        const res = await fetch('http://localhost:5055/api/login/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            Email: document.getElementById('username').value,
+            Senha: document.getElementById('password').value,
+          })
+        });
+ 
+        if (res.ok) {
+          const data = await res.json();
+          sessionStorage.setItem('token', data.token);
+          window.location.href = 'dashboard.html';
+        } else {
+          msgEl.textContent = 'Credenciais inválidas.';
+          msgEl.className = 'msg error';
         }
-            });
-        </script>
-    </body>
+      } catch (err) {
+        msgEl.textContent = 'Não foi possível conectar ao servidor.';
+        msgEl.className = 'msg error';
+      }
+    });
+  </script>
+</body>
 </html>

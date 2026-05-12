@@ -1,78 +1,85 @@
 <!DOCTYPE html>
-<html>
-    <body>
-
-        <h1>Projeto Integrador 1 (TESTE)</h1>
-
-        <p>Cadastre-se:</p>
-  
-        <label for="userName">Nome:</label><br>
-        <input type="text" id="userName" name="userName" value=""><br><br>
-
-        <label for="userEmail">Email:</label><br>
-        <input type="text" id="userEmail" name="userEmail" value=""><br><br>
-
-        <label for="userPassword">Senha:</label><br>
-        <input type="password" id="userPassword" name="userPassword" value=""><br><br>
-
-        <button type="button" onclick="EnviarDadosUsuario()">Enviar</button>
-
-        <p id="demo"></p>
-
-        <br><br><br><br><br><br><br><br>
-        <script>
-
-            async function EnviarDadosUsuario() 
-            { 
-                const API_BASE_URL = "http://localhost:5055";
-                const USUARIO_ENDPOINT = `${API_BASE_URL}/api/Usuario`;
-
-                var userName     = document.getElementById("userName").value;
-                var userEmail    = document.getElementById("userEmail").value;
-                var userPassword = document.getElementById("userPassword").value;
-
-                // Validação básica no front
-                if (!userName || !userEmail || !userPassword) {
-                    document.getElementById("demo").innerHTML = "Preencha todos os campos!";
-                    return;
-                }
-
-                const usuario = {
-                    nome:  userName,
-                    email: userEmail,
-                    senha: userPassword
-                };
-
-                try {
-                    const response = await fetch(USUARIO_ENDPOINT, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify(usuario)
-                    });
-
-                    if (response.ok) {
-                        const resultado = await response.json();
-                        document.getElementById("demo").innerHTML = 
-                            `Usuário <strong>${resultado.nome}</strong> cadastrado com sucesso! (ID: ${resultado.id})`;
-                        
-                        // Limpa o formulario apos sucesso
-                        document.getElementById("userName").value     = "";
-                        document.getElementById("userEmail").value    = "";
-                        document.getElementById("userPassword").value = "";
-                    } else {
-                        const erro = await response.text();
-                        document.getElementById("demo").innerHTML = `Erro ao cadastrar: ${erro}`;
-                    }
-
-                } catch (error) {
-                    document.getElementById("demo").innerHTML = 
-                        `Não foi possível conectar à API. Verifique se o servidor está rodando.<br><small>${error}</small>`;
-                }
-            }
-
-        </script>
-    </body>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cadastro</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+ 
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <h1>Criar conta</h1>
+      <p class="subtitle">Preencha os campos para se cadastrar.</p>
+ 
+      <div class="form-group">
+        <label for="userName">Nome</label>
+        <input type="text" id="userName" name="userName" placeholder="Seu nome"/>
+      </div>
+ 
+      <div class="form-group">
+        <label for="userEmail">Email</label>
+        <input type="text" id="userEmail" name="userEmail" placeholder="seu@email.com"/>
+      </div>
+ 
+      <div class="form-group">
+        <label for="userPassword">Senha</label>
+        <input type="password" id="userPassword" name="userPassword" placeholder="••••••••"/>
+      </div>
+ 
+      <button class="btn btn-primary" style="width:100%" onclick="EnviarDadosUsuario()">Cadastrar</button>
+ 
+      <p id="demo" class="msg"></p>
+ 
+      <p class="text-muted text-small mt-2" style="text-align:center">
+        Já tem conta? <a href="login.html" style="color:var(--accent)">Entrar</a>
+      </p>
+    </div>
+  </div>
+ 
+  <script>
+    async function EnviarDadosUsuario() {
+      const API_BASE_URL = "http://localhost:5055";
+      const USUARIO_ENDPOINT = `${API_BASE_URL}/api/Usuario`;
+      const msgEl = document.getElementById("demo");
+ 
+      const userName     = document.getElementById("userName").value;
+      const userEmail    = document.getElementById("userEmail").value;
+      const userPassword = document.getElementById("userPassword").value;
+ 
+      if (!userName || !userEmail || !userPassword) {
+        msgEl.textContent = "Preencha todos os campos!";
+        msgEl.className = "msg error";
+        return;
+      }
+ 
+      const usuario = { nome: userName, email: userEmail, senha: userPassword };
+ 
+      try {
+        const response = await fetch(USUARIO_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(usuario)
+        });
+ 
+        if (response.ok) {
+          const resultado = await response.json();
+          msgEl.textContent = `Usuário ${resultado.nome} cadastrado com sucesso!`;
+          msgEl.className = "msg success";
+          document.getElementById("userName").value = "";
+          document.getElementById("userEmail").value = "";
+          document.getElementById("userPassword").value = "";
+        } else {
+          const erro = await response.text();
+          msgEl.textContent = `Erro ao cadastrar: ${erro}`;
+          msgEl.className = "msg error";
+        }
+      } catch (error) {
+        msgEl.textContent = `Não foi possível conectar à API. ${error}`;
+        msgEl.className = "msg error";
+      }
+    }
+  </script>
+</body>
 </html>
-                
