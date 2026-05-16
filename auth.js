@@ -7,7 +7,7 @@ async function checkAuth() {
     }
 
     try {
-        const res = await fetch('http://localhost:5055/api/login/me', {
+        const res = await fetch('/api/login/me', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`  // ✅ send token in header
